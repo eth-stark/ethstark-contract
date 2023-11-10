@@ -1,25 +1,28 @@
-#[starknet::interface]
-trait IHelloStarknet<TContractState> {
-    fn increase_balance(ref self: TContractState, amount: felt252);
-    fn get_balance(self: @TContractState) -> felt252;
+fn main() -> felt252 {
+    fib(16)
 }
 
-#[starknet::contract]
-mod HelloStarknet {
-    #[storage]
-    struct Storage {
-        balance: felt252, 
+fn fib(mut n: felt252) -> felt252 {
+    let mut a: felt252 = 0;
+    let mut b: felt252 = 1;
+    loop {
+        if n == 0 {
+            break a;
+        }
+        n = n - 1;
+        let temp = b;
+        b = a + b;
+        a = temp;
     }
+}
 
-    #[external(v0)]
-    impl HelloStarknetImpl of super::IHelloStarknet<ContractState> {
-        fn increase_balance(ref self: ContractState, amount: felt252) {
-            assert(amount != 0, 'Amount cannot be 0');
-            self.balance.write(self.balance.read() + amount);
-        }
+#[cfg(test)]
+mod tests {
+    use super::fib;
 
-        fn get_balance(self: @ContractState) -> felt252 {
-            self.balance.read()
-        }
+    #[test]
+    #[available_gas(100000)]
+    fn it_works() {
+        assert(fib(16) == 987, 'it works!');
     }
 }
